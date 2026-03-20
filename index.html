@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chicken Party Pre-Order</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Chicken Party Pre-Order</h1>
+
+<p>
+✔ Pre-order only (2 days notice)<br/>
+✔ Limited slots available<br/>
+✔ Payment required to confirm
+</p>
+
+<form id="orderForm">
+
+<input name="name" placeholder="Full Name" required />
+<input name="phone" placeholder="Phone Number" required />
+
+<label>Pickup Date</label>
+<input type="date" name="date" required />
+
+<label>Pickup Time</label>
+<select name="time">
+  <option>12:00</option>
+  <option>14:00</option>
+  <option>16:00</option>
+</select>
+
+<label>Package</label>
+<select name="menu" id="menu">
+  <option value="120">Set A - $120</option>
+  <option value="220">Set B - $220</option>
+  <option value="90">Kids Pack - $90</option>
+</select>
+
+<label>Add-ons</label><br/>
+<input type="checkbox" value="30" class="addon"> Extra Chicken (+$30)<br/>
+<input type="checkbox" value="10" class="addon"> Fries (+$10)<br/>
+<input type="checkbox" value="15" class="addon"> Drinks (+$15)
+
+<br/><br/>
+
+<label>Notes</label>
+<textarea name="note"></textarea>
+
+<h3 id="total">Total: $0</h3>
+
+<button type="submit">Place Order</button>
+
+</form>
+
+<div id="result" style="display:none;">
+  <h2>Order Received</h2>
+
+  <p>Please transfer to confirm your order:</p>
+
+  <p><strong>Account:</strong> <span id="accountNumber"></span></p>
+  <p><strong>Name:</strong> Brodiam Ltd</p>
+  <p><strong>Reference:</strong> <span id="reference"></span></p>
+
+  <p id="finalAmount"></p>
+
+  <p><strong>Orders confirmed after payment.</strong></p>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
