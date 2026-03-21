@@ -73,9 +73,14 @@ function generateOrderId() {
   return "ORD"+Math.floor(1000 + Math.random() * 9000).toString();
 }
 
-// ===== 폼 제출 =====
+// ===== submit =====
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  // ===== Loading =====
+  const submitBtn = document.getElementById("orderSubmit");
+  submitBtn.disabled = true;
+  submitBtn.innerText = "Placing Order...";
 
   const name = document.querySelector("input[name='name']").value;
   const email = document.querySelector("input[name='email']").value;
@@ -116,6 +121,11 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
     console.log("Server response:", json);
   } catch (err) {
     console.error("Error sending data:", err);
+    // ===== Failure =====
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Place Order →";
+    alert("Something went wrong. Please try again.");
+    return;
   }
 
   document.getElementById("orderForm").style.display = "none";
