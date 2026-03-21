@@ -1,24 +1,363 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial;
-  max-width: 500px;
-  margin: auto;
-  padding: 20px;
+  font-family: "Afacad", sans-serif;
+  background: #f5f5f5;
+  padding: 20px 16px;
 }
 
-input, select, textarea {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
+/* ===== Container ===== */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 20px;
 }
 
-button {
-  background: black;
-  color: white;
-  padding: 10px;
-  width: 100%;
-  border: none;
+/* ===== Logo / Header ===== */
+.container > img {
+  display: block;
+  margin: 0 auto 12px;
 }
 
 h1 {
+  font-size: 1.8rem;
   text-align: center;
+  margin-bottom: 12px;
+}
+
+.info-text {
+  font-size: 9.5px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ===== Section Title ===== */
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #999;
+  margin: 20px 0 8px;
+}
+
+/* ===== Inputs ===== */
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  margin: 4px 0;
+  font-size: 16px;
+  font-family: "Afacad", sans-serif;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  outline: none;
+  transition: border 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #4CAF50;
+  background: #fff;
+}
+
+.row-2 {
+  display: flex;
+  gap: 8px;
+}
+
+.row-2 input,
+.row-2 select {
+  flex: 1;
+}
+
+textarea {
+  resize: none;
+  height: 80px;
+  margin-top: 8px;
+}
+
+/* ===== Flatpickr ===== */
+.flatpickr-calendar {
+  width: 280px !important;
+  font-size: 13px !important;
+}
+.flatpickr-day {
+  max-width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+}
+.flatpickr-months .flatpickr-month {
+  height: 40px !important;
+}
+.numInputWrapper {
+  font-size: 13px !important;
+}
+
+/* ===== Set Buttons ===== */
+.set-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.set-btn {
+  flex: 1;
+  background: #f0f0f0;
+  border-radius: 10px;
+  padding: 14px 10px;
+  font-size: 16px;
+  font-family: "Afacad", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.set-btn .set-name {
+  font-weight: 600;
+}
+
+.set-btn .set-price {
+  font-size: 14px;
+  color: #555;
+}
+
+.set-btn.selected {
+  background: #e8f5e9;
+  border-color: #4CAF50;
+  color: #2e7d32;
+}
+
+.set-btn.selected .set-price {
+  color: #2e7d32;
+}
+
+/* ===== Qty Buttons ===== */
+.qty-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.qty-label {
+  font-size: 13px;
+  color: #999;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.qty-btn {
+  flex: 1;
+  padding: 10px 0;
+  background: #f0f0f0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: "Afacad", sans-serif;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.qty-btn.selected {
+  background: #e8f5e9;
+  border-color: #4CAF50;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* ===== Add-on Buttons ===== */
+.addon-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.addon-btn {
+  flex: 1 1 calc(33% - 8px);
+  background: #f0f0f0;
+  border-radius: 10px;
+  padding: 12px 8px;
+  font-size: 13px;
+  font-family: "Afacad", sans-serif;
+  text-align: center;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+
+.addon-btn span {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.addon-btn.selected {
+  background: #e8f5e9;
+  border-color: #4CAF50;
+  color: #2e7d32;
+}
+
+/* ===== Order Footer ===== */
+.order-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.total-block {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.total-label {
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#total {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111;
+}
+
+/* ===== Submit Button ===== */
+.submit-btn {
+  flex: 1;
+  background: #4CAF50;
+  color: #fff;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 17px;
+  font-family: "Afacad", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: none;
+}
+
+.submit-btn:hover {
+  background: #388e3c;
+}
+
+/* ===== Confirmation ===== */
+#result {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.confirm-icon {
+  font-size: 44px;
+  margin-bottom: 8px;
+}
+
+#result h2 {
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+}
+
+.confirm-sub {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.payment-box {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.payment-row:last-of-type {
+  border-bottom: none;
+}
+
+.payment-label {
+  color: #888;
+  font-size: 13px;
+}
+
+.payment-row strong {
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.copy-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: "Afacad", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.copy-btn:hover {
+  background: #f0f0f0;
+}
+
+.confirm-details {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 15px;
+}
+
+.confirm-row span {
+  color: #888;
+}
+
+.note {
+  font-size: 13px;
+  color: #777;
+  line-height: 1.5;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 480px) {
+  body { padding: 12px 10px; }
+  .container { padding: 20px 16px; }
+  h1 { font-size: 1.5rem; }
+  .addon-btn { flex: 1 1 calc(33% - 8px); font-size: 12px; }
+  #total { font-size: 22px; }
 }
