@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aboozy Catering Pre-order</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400..700;1,400..700&family=MuseoModerno:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -19,33 +21,35 @@
   <div class="hero-tag">Catering Pre-Order</div>
   <h1>Crispy Chicken<br><em>Delivery</em></h1>
 </div>
- 
+
 <div class="container">
   <p class="info-text">
-    ✔ Pre-order only (4 days notice) &nbsp;
-    ✔ Limited slots &nbsp;
+    ✔ Pre-order only (4 days notice) &nbsp;·&nbsp;
+    ✔ Limited slots &nbsp;·&nbsp;
     ✔ Payment required to confirm
   </p>
 
-  <!-- Pickup -->
-  <h2 class="section-title">Delivery</h2>
-  <input type="date" id="fdate">
-  <div class="block-row">
-    <span>Select time</span>
-    <button class="blk-toggle" id="blkBtn" onclick="toggleBlock()">Block times</button>
-  </div>
-  <div class="time-grid" id="timeGrid"></div>
-  <p class="block-hint" id="blockHint" style="display:none">Tap a time to mark it as unavailable</p>
+  <!-- Delivery -->
+  <h2 class="section-title">Delivery Date & Time</h2>
+  <input type="text" id="fdate" placeholder="Select delivery date" readonly>
+  <div class="field-gap"></div>
+  <select id="ftime">
+    <option value="" disabled selected>Select delivery time</option>
+  </select>
+  <p class="slot-warning" id="slotWarning" style="display:none">
+    ⚠️ This time slot is fully booked. Please choose another time.
+  </p>
 
   <!-- Menu -->
   <h2 class="section-title">Select Your Menu</h2>
   <div class="set-group" id="menuContainer"></div>
-  <!-- <button class="add-menu-btn" onclick="addCustomMenu()">+ Add custom menu item</button> -->
 
   <!-- Sauce -->
   <h2 class="section-title">Sauce Choice</h2>
   <div class="sauce-grid" id="sauceGrid"></div>
-  <!-- <input type="text" id="fmemo" placeholder="Memo " style="margin-top:8px"> -->
+  <div class="sauce-hint">
+    <span>Tip:</span> You can select up to 2 sauces.
+  </div>
 
   <!-- Add-ons -->
   <h2 class="section-title">Add-ons</h2>
@@ -54,13 +58,55 @@
   <!-- Notes -->
   <textarea id="fnotes" placeholder="Special requests (optional)"></textarea>
 
+  <!-- Payment Method -->
+  <h2 class="section-title">Payment Method</h2>
+  <p class="payment-notice">⚠️ We accept Cash, Bank Transfer, and Debit Card only.<br>Credit cards and Paywave are <strong>not available</strong>.</p>
+  <div class="pay-method-group" id="payMethodGroup">
+    <button type="button" class="pay-method-btn" data-method="cash">
+      <span class="pm-icon">💵</span>
+      <span class="pm-name">Cash</span>
+      <span class="pm-desc">Pay on delivery</span>
+    </button>
+    <button type="button" class="pay-method-btn" data-method="transfer">
+      <span class="pm-icon">🏦</span>
+      <span class="pm-name">Bank Transfer</span>
+      <span class="pm-desc">Transfer before delivery</span>
+    </button>
+    <button type="button" class="pay-method-btn" data-method="debit">
+      <span class="pm-icon">💳</span>
+      <span class="pm-name">Debit Card</span>
+      <span class="pm-desc">Pay on delivery</span>
+    </button>
+  </div>
+
+  <!-- Transfer info (shown only when transfer selected) -->
+  <div class="transfer-info" id="transferInfo" style="display:none">
+    <div class="account-row">
+      <div>
+        <div class="account-label">Account Name</div>
+        <div class="account-val">BRODIAM LTD</div>
+      </div>
+      <div>
+        <div class="account-label">Account Number</div>
+        <div class="account-val">06-0730-0465387-00</div>
+      </div>
+      <button class="copy-inline-btn" onclick="copyInline(this)">Copy</button>
+    </div>
+    <p class="transfer-tip">💡 Please transfer before delivery. Your order will be confirmed once payment clears.</p>
+  </div>
+
+  <!-- On-delivery info (shown for cash/debit) -->
+  <div class="ondelivery-info" id="ondeliveryInfo" style="display:none">
+    <p class="ondelivery-tip" id="ondeliveryText"></p>
+  </div>
+
   <!-- Your Details -->
   <h2 class="section-title">Your Details</h2>
   <input type="text" id="fname" placeholder="Full Name" required>
-  <input type="text" name="address" placeholder="Address e.g 123a Rimu Rd, Paraparaumu" required>
+  <input type="text" id="faddress" placeholder="Delivery address e.g. 123a Rimu Rd, Paraparaumu" required>
   <div class="row-2">
     <input type="tel" id="fphone" placeholder="Phone" required>
-    <input type="email" id="femail" placeholder="Email" >
+    <input type="email" id="femail" placeholder="Email (optional)">
   </div>
 
   <!-- Footer -->
@@ -76,21 +122,25 @@
 <!-- Overlay -->
 <div class="overlay" id="overlay">
   <div class="overlay-card">
-    <div class="overlay-icon">⏳</div>
-    <h2>Almost There!</h2>
-    <p class="overlay-sub" id="overlaySub">Transfer payment now to secure your order.</p>
-    <div class="pay-cta">
+    <div class="overlay-icon" id="overlayIcon">⏳</div>
+    <h2 id="overlayTitle">Almost There!</h2>
+    <p class="overlay-sub" id="overlaySub"></p>
+
+    <!-- Transfer payment CTA -->
+    <div class="pay-cta" id="overlayCta" style="display:none">
       <div class="pay-cta-label">Transfer to BRODIAM LTD</div>
       <div class="pay-cta-row">
         <span class="pay-cta-num">06-0730-0465387-00</span>
         <button class="copy-btn" id="copyBtn" onclick="doCopy()">Copy</button>
       </div>
     </div>
+
     <div class="overlay-summary">
       <div class="os-row"><span>Order</span><span id="os-order"></span></div>
       <div class="os-row"><span>Sauce</span><span id="os-sauce"></span></div>
       <div class="os-row"><span>Add-ons</span><span id="os-addons"></span></div>
       <div class="os-row"><span>Delivery</span><span id="os-pickup"></span></div>
+      <div class="os-row"><span>Payment</span><span id="os-payment"></span></div>
       <div class="os-row"><span>Reference</span><span id="os-ref" style="font-weight:700"></span></div>
       <div class="os-divider"></div>
       <div class="os-row"><span>Total</span><span class="os-total" id="os-total">$0</span></div>
