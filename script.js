@@ -62,7 +62,12 @@ function checkSlot() {
 /* ── flatpickr ── */
 flatpickr('#fdate', {
   minDate: new Date().fp_incr(4),
-  disable: [],
+  disable: [
+    "2026-03-28",
+    "2026-05-26",
+    // Block date range
+    // { from: "2026-04-01", to: "2026-04-07" }
+  ],
   dateFormat: 'Y-m-d',
   disableMobile: false,
   onChange: checkSlot
