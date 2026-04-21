@@ -360,6 +360,57 @@ textarea {
 .addon-btn.selected .addon-price { color: #555; }
 .addon-btn:hover { border-color: var(--pink); color: var(--black) }
 
+/* ── Addon qty controls ── */
+.addon-btn {
+  position: relative;
+  cursor: default;        /* card 자체 클릭 제거 */
+}
+.addon-qty-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--grey-border);
+}
+.addon-qty-ctrl {
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--grey-border);
+  border-radius: 50%;
+  background: var(--white);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Afacad', sans-serif;
+  color: var(--black);
+  transition: 0.15s;
+  line-height: 1;
+}
+.addon-btn.selected .addon-qty-ctrl {
+  border-color: var(--black);
+  color: var(--black);
+}
+.addon-qty-ctrl:hover {
+  background: var(--black);
+  border-color: var(--black);
+  color: var(--white);
+}
+.addon-qty-num {
+  font-family: 'MuseoModerno', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+  color: var(--black);
+}
+.addon-btn.selected .addon-qty-num {
+  color: var(--black);
+}
+
 /* ── Order Footer ── */
 .order-footer {
   display: flex;

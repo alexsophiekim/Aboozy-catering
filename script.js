@@ -80,8 +80,8 @@ document.getElementById('payMethodGroup').addEventListener('click', e => {
   document.getElementById('ondeliveryInfo').style.display = (selMethod === 'cash' || selMethod === 'debit') ? 'block' : 'none';
 
   const msg = selMethod === 'cash'
-    ? '💵 You will pay cash on delivery. Please have the exact amount ready.'
-    : '💳 You will pay by debit card on delivery. EFTPOS available.';
+    ? '💵 Cash on delivery. Please have cash ready.'
+    : '💳 You will pay by debit card on delivery. EFTPOS only.';
   document.getElementById('ondeliveryText').textContent = msg;
 });
 
@@ -162,9 +162,18 @@ function renderAddons() {
   const g = document.getElementById('addonGroup');
   g.innerHTML = '';
   ADDONS.forEach(a => {
-    const b = document.createElement('button');
-    b.className = 'addon-btn' + (addonSel[a.id] ? ' selected' : '');
-    b.innerHTML = `<span class="addon-name">${a.name}</span><span class="addon-price">+$${a.price}</span>`;
+    const qty = addonSel[a.id] || 0;
+    const b = document.createElement('div');
+    b.className = 'addon-btn' + (qty > 0 ? ' selected' : '');
+    b.innerHTML = `
+      <span class="addon-name">${a.name}</span>
+      <span class="addon-price">+$${a.price}</span>
+      <div class="addon-qty-row">
+        <button class="addon-qty-ctrl" onclick="event.stopPropagation();chgAddon('${a.id}',-1)">−</button>
+        <span class="addon-qty-num">${qty}</span>
+        <button class="addon-qty-ctrl" onclick="event.stopPropagation();chgAddon('${a.id}',1)">+</button>
+      </div>
+    `;
     b.onclick = () => {
       addonSel[a.id] = addonSel[a.id] ? 0 : 1;
       renderAddons();
@@ -172,6 +181,12 @@ function renderAddons() {
     };
     g.appendChild(b);
   });
+}
+
+function chgAddon(id, d) {
+  addonSel[id] = Math.max(0, (addonSel[id] || 0) + d);
+  renderAddons();
+  calcTotal();
 }
 
 /* ── Total ── */
