@@ -250,7 +250,7 @@ async function placeOrder() {
   const total    = calcTotal();
   const orderId  = 'ORD' + Math.floor(1000 + Math.random() * 9000);
   const items    = MENUS.filter(m => menuQty[m.id] > 0).map(m => m.name + ' ×' + menuQty[m.id]).join(', ');
-  const addons   = ADDONS.filter(a => addonSel[a.id]).map(a => a.name).join(', ') || '—';
+  const addons   = ADDONS.filter(a => addonSel[a.id]).map(a => `${a.name} ×${addonSel[a.id]}`).join(', ') || '—';
   const sauce    = selSauces.length > 0 ? selSauces.map(i => SAUCES[i]).join(' + ') : '—';
   const payLabel = selMethod === 'transfer' ? 'Bank Transfer'
                  : selMethod === 'cash'     ? 'Cash on Delivery'
@@ -291,6 +291,7 @@ async function placeOrder() {
   document.getElementById('os-payment').textContent = payLabel;
   document.getElementById('os-ref').textContent     = orderId;
   document.getElementById('os-total').textContent   = '$' + total;
+  document.getElementById('os-notes').textContent   = notes || '—'; 
 
   if (selMethod === 'transfer') {
     document.getElementById('overlayIcon').textContent  = '⏳';
