@@ -81,7 +81,7 @@ function checkSlot() {
 
 /* ── flatpickr ── */
 flatpickr('#fdate', {
-  minDate: new Date().fp_incr(4),
+  minDate: new Date().fp_incr(1),
   disable: [
     "2026-03-28",
     "2026-05-26",
@@ -279,8 +279,8 @@ async function placeOrder() {
 
 // 제출 직전 실시간 슬롯 체크
   try {
-    const res   = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`);
-    const json  = await res.json();
+    const res  = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`);
+    const json = await res.json();
     if (json.count >= MAX_PER_SLOT) {
       alert('Sorry, this time slot is fully booked. Please choose another time.');
       btn.disabled = false;
@@ -289,6 +289,11 @@ async function placeOrder() {
     }
   } catch (err) {
     console.error('Slot check error:', err);
+    // ❌ 슬롯 확인 실패시 제출 막기
+    alert('Unable to verify slot availability. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Place Order →';
+    return;
   }
 
   // 그 다음 fetch POST
