@@ -225,13 +225,14 @@ function calcTotal() {
 
 /* ── Submit ── */
 async function placeOrder() {
+  document.activeElement.blur(); // ← focus out
+  const notes = document.getElementById('fnotes').value;
   const name    = document.getElementById('fname').value.trim();
   const email   = document.getElementById('femail').value.trim();
   const phone   = document.getElementById('fphone').value.trim();
   const address = document.getElementById('faddress').value.trim();
   const date    = document.getElementById('fdate').value;
   const time    = document.getElementById('ftime').value;
-  const notes   = document.getElementById('fnotes').value.trim();
 
   if (!name)    { alert('Please enter your full name.');        return; }
   if (!phone)   { alert('Please enter your phone number.');     return; }
@@ -287,11 +288,11 @@ async function placeOrder() {
   document.getElementById('os-order').textContent   = items;
   document.getElementById('os-sauce').textContent   = sauce;
   document.getElementById('os-addons').textContent  = addons;
+  document.getElementById('os-notes').textContent   = notes || '—'; 
   document.getElementById('os-pickup').textContent  = date + ' at ' + time;
   document.getElementById('os-payment').textContent = payLabel;
   document.getElementById('os-ref').textContent     = orderId;
   document.getElementById('os-total').textContent   = '$' + total;
-  document.getElementById('os-notes').textContent   = notes || '—'; 
 
   if (selMethod === 'transfer') {
     document.getElementById('overlayIcon').textContent  = '⏳';
