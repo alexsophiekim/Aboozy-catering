@@ -81,7 +81,7 @@ function checkSlot() {
 
 /* ── flatpickr ── */
 flatpickr('#fdate', {
-  minDate: new Date().fp_incr(1),
+  minDate: new Date().fp_incr(0),
   disable: [
     "2026-03-28",
     "2026-05-26",
