@@ -277,6 +277,21 @@ async function placeOrder() {
     Total:   total
   };
 
+// 제출 직전 실시간 슬롯 체크
+  try {
+    const res   = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`);
+    const json  = await res.json();
+    if (json.count >= MAX_PER_SLOT) {
+      alert('Sorry, this time slot is fully booked. Please choose another time.');
+      btn.disabled = false;
+      btn.textContent = 'Place Order →';
+      return;
+    }
+  } catch (err) {
+    console.error('Slot check error:', err);
+  }
+
+  // 그 다음 fetch POST
   try {
     await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
     slotCounts[key] = (slotCounts[key] || 0) + 1;
