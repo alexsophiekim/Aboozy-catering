@@ -11,7 +11,12 @@ const ADDONS = [
   { id: 'sauce',  name: 'Extra Sauce',        price: 2  },
   { id: 'drink',  name: 'Soft Drink (330ml)', price: 3  }
 ];
-
+// blocked times
+const BLOCKED_TIMES = {
+  "2026-05-01": ["16:00", "16:30"],
+  "2026-05-07": ["16:00", "16:30", "17:00"],
+  // continue adding blocked times here
+};
 const MAX_PER_SLOT = 3;
 let slotCounts = {};
 
@@ -46,10 +51,25 @@ function slotKey() {
 }
 
 function checkSlot() {
-  const key = slotKey();
+  const date = document.getElementById('fdate').value;
+  const time = document.getElementById('ftime').value;
+  const sel  = document.getElementById('ftime');
+  const warn = document.getElementById('slotWarning');
+
+  // 시간 옵션 업데이트 (블락된 시간 비활성화)
+  Array.from(sel.options).forEach(opt => {
+    const blocked = BLOCKED_TIMES[date] || [];
+    opt.disabled = blocked.includes(opt.value);
+    // 블락된 옵션이 현재 선택되어 있으면 해제
+    if (opt.disabled && opt.selected) {
+      sel.value = "";
+    }
+  });
+
+  // 슬롯 풀 체크
+  const key   = slotKey();
   if (!key) return;
   const count = slotCounts[key] || 0;
-  const warn = document.getElementById('slotWarning');
   if (count >= MAX_PER_SLOT) {
     warn.style.display = 'block';
     document.getElementById('orderSubmit').disabled = true;
