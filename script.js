@@ -50,32 +50,37 @@ function slotKey() {
   return date && time ? `${date}_${time}` : null;
 }
 
-function checkSlot() {
+async function checkSlot() {
   const date = document.getElementById('fdate').value;
   const time = document.getElementById('ftime').value;
   const sel  = document.getElementById('ftime');
   const warn = document.getElementById('slotWarning');
 
-  // 시간 옵션 업데이트 (블락된 시간 비활성화)
+  // 블락된 시간 비활성화
   Array.from(sel.options).forEach(opt => {
     const blocked = BLOCKED_TIMES[date] || [];
     opt.disabled = blocked.includes(opt.value);
-    // 블락된 옵션이 현재 선택되어 있으면 해제
-    if (opt.disabled && opt.selected) {
-      sel.value = "";
-    }
+    if (opt.disabled && opt.selected) sel.value = "";
   });
 
-  // 슬롯 풀 체크
-  const key   = slotKey();
-  if (!key) return;
-  const count = slotCounts[key] || 0;
-  if (count >= MAX_PER_SLOT) {
-    warn.style.display = 'block';
-    document.getElementById('orderSubmit').disabled = true;
-  } else {
-    warn.style.display = 'none';
-    document.getElementById('orderSubmit').disabled = false;
+  if (!date || !time) return;
+
+  // 실시간 서버 슬롯 체크
+  try {
+    const res   = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`);
+    const json  = await res.json();
+    const count = json.count || 0;
+    slotCounts[`${date}_${time}`] = count;
+
+    if (count >= MAX_PER_SLOT) {
+      warn.style.display = 'block';
+      document.getElementById('orderSubmit').disabled = true;
+    } else {
+      warn.style.display = 'none';
+      document.getElementById('orderSubmit').disabled = false;
+    }
+  } catch (err) {
+    console.error('Slot check error:', err);
   }
 }
 
