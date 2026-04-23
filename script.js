@@ -11,22 +11,35 @@ const ADDONS = [
   { id: 'sauce',  name: 'Extra Sauce',        price: 2  },
   { id: 'drink',  name: 'Soft Drink (330ml)', price: 3  }
 ];
-// blocked times
+
+// 블락할 날짜별 시간
 const BLOCKED_TIMES = {
   "2026-05-01": ["16:00", "16:30"],
   "2026-05-07": ["16:00", "16:30", "17:00"],
   // continue adding blocked times here
 };
+
 const MAX_PER_SLOT = 3;
 let slotCounts = {};
 
 let menuQty   = {};
 let addonSel  = {};
-let selSauces = [];      // ← array, up to 2
+let selSauces = [];
 let selMethod = null;
 
 MENUS.forEach(m  => menuQty[m.id]  = 0);
 ADDONS.forEach(a => addonSel[a.id] = 0);
+
+/* ── 페이지 로드시 전체 슬롯 미리 로드 ── */
+async function preloadSlotCounts() {
+  try {
+    const res  = await fetch(SCRIPT_URL);
+    const json = await res.json();
+    if (json.counts) slotCounts = json.counts;
+  } catch (err) {
+    console.error('Preload error:', err);
+  }
+}
 
 /* ── Time dropdown 16:00–21:00, 30 min ── */
 function buildTimeOptions() {
@@ -50,45 +63,34 @@ function slotKey() {
   return date && time ? `${date}_${time}` : null;
 }
 
-let slotCheckController = null; // 이전 요청 취소용
-
-async function checkSlot() {
+/* ── 슬롯 체크 - 캐시에서 즉시 읽음 ── */
+function checkSlot() {
   const date = document.getElementById('fdate').value;
   const time = document.getElementById('ftime').value;
   const sel  = document.getElementById('ftime');
   const warn = document.getElementById('slotWarning');
 
-  // 블락된 시간 비활성화
+  // 블락된 시간 + 꽉 찬 슬롯 비활성화
   Array.from(sel.options).forEach(opt => {
+    if (!opt.value) return;
     const blocked = BLOCKED_TIMES[date] || [];
-    opt.disabled = blocked.includes(opt.value);
+    const full    = (slotCounts[`${date}_${opt.value}`] || 0) >= MAX_PER_SLOT;
+    opt.disabled  = blocked.includes(opt.value) || full;
+    opt.textContent = full && !blocked.includes(opt.value)
+      ? `${opt.value} — Full`
+      : opt.value;
     if (opt.disabled && opt.selected) sel.value = "";
   });
 
-  // 시간 바꾸면 즉시 경고 숨기고 버튼 활성화
   warn.style.display = 'none';
   document.getElementById('orderSubmit').disabled = false;
 
   if (!date || !time) return;
 
-  // 이전 요청 취소
-  if (slotCheckController) slotCheckController.abort();
-  slotCheckController = new AbortController();
-
-  try {
-    const res   = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`, {
-      signal: slotCheckController.signal
-    });
-    const json  = await res.json();
-    const count = json.count || 0;
-    slotCounts[`${date}_${time}`] = count;
-
-    if (count >= MAX_PER_SLOT) {
-      warn.style.display = 'block';
-      document.getElementById('orderSubmit').disabled = true;
-    }
-  } catch (err) {
-    if (err.name !== 'AbortError') console.error('Slot check error:', err);
+  const count = slotCounts[`${date}_${time}`] || 0;
+  if (count >= MAX_PER_SLOT) {
+    warn.style.display = 'block';
+    document.getElementById('orderSubmit').disabled = true;
   }
 }
 
@@ -98,7 +100,6 @@ flatpickr('#fdate', {
   disable: [
     "2026-03-28",
     "2026-05-26",
-    // Block date range
     // { from: "2026-04-01", to: "2026-04-07" }
   ],
   dateFormat: 'Y-m-d',
@@ -238,8 +239,8 @@ function calcTotal() {
 
 /* ── Submit ── */
 async function placeOrder() {
-  document.activeElement.blur(); // ← focus out
-  const notes = document.getElementById('fnotes').value;
+  document.activeElement.blur();
+  const notes   = document.getElementById('fnotes').value;
   const name    = document.getElementById('fname').value.trim();
   const email   = document.getElementById('femail').value.trim();
   const phone   = document.getElementById('fphone').value.trim();
@@ -255,6 +256,7 @@ async function placeOrder() {
   if (!MENUS.some(m => menuQty[m.id] > 0)) { alert('Please select at least one menu item.'); return; }
   if (!selMethod) { alert('Please select a payment method.');   return; }
 
+  // 캐시 기반 슬롯 체크
   const key = slotKey();
   if ((slotCounts[key] || 0) >= MAX_PER_SLOT) {
     alert('Sorry, this time slot is fully booked. Please choose another time.');
@@ -290,7 +292,7 @@ async function placeOrder() {
     Total:   total
   };
 
-// 제출 직전 실시간 슬롯 체크
+  // 제출 직전 서버 슬롯 최종 확인
   try {
     const res  = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`);
     const json = await res.json();
@@ -302,17 +304,17 @@ async function placeOrder() {
     }
   } catch (err) {
     console.error('Slot check error:', err);
-    // ❌ 슬롯 확인 실패시 제출 막기
     alert('Unable to verify slot availability. Please try again.');
     btn.disabled = false;
     btn.textContent = 'Place Order →';
     return;
   }
 
-  // 그 다음 fetch POST
+  // POST
   try {
     await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
     slotCounts[key] = (slotCounts[key] || 0) + 1;
+    checkSlot(); // 꽉 찬 슬롯 즉시 반영
   } catch (err) {
     console.error('Submit error:', err);
   }
@@ -321,7 +323,7 @@ async function placeOrder() {
   document.getElementById('os-order').textContent   = items;
   document.getElementById('os-sauce').textContent   = sauce;
   document.getElementById('os-addons').textContent  = addons;
-  document.getElementById('os-notes').textContent   = notes || '—'; 
+  document.getElementById('os-notes').textContent   = notes || '—';
   document.getElementById('os-pickup').textContent  = date + ' at ' + time;
   document.getElementById('os-payment').textContent = payLabel;
   document.getElementById('os-ref').textContent     = orderId;
@@ -381,3 +383,4 @@ renderMenus();
 renderSauces();
 renderAddons();
 calcTotal();
+preloadSlotCounts(); // page load
