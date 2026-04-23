@@ -50,6 +50,8 @@ function slotKey() {
   return date && time ? `${date}_${time}` : null;
 }
 
+let slotCheckController = null; // 이전 요청 취소용
+
 async function checkSlot() {
   const date = document.getElementById('fdate').value;
   const time = document.getElementById('ftime').value;
@@ -63,11 +65,20 @@ async function checkSlot() {
     if (opt.disabled && opt.selected) sel.value = "";
   });
 
+  // 시간 바꾸면 즉시 경고 숨기고 버튼 활성화
+  warn.style.display = 'none';
+  document.getElementById('orderSubmit').disabled = false;
+
   if (!date || !time) return;
 
-  // 실시간 서버 슬롯 체크
+  // 이전 요청 취소
+  if (slotCheckController) slotCheckController.abort();
+  slotCheckController = new AbortController();
+
   try {
-    const res   = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`);
+    const res   = await fetch(`${SCRIPT_URL}?date=${date}&time=${time}`, {
+      signal: slotCheckController.signal
+    });
     const json  = await res.json();
     const count = json.count || 0;
     slotCounts[`${date}_${time}`] = count;
@@ -75,12 +86,9 @@ async function checkSlot() {
     if (count >= MAX_PER_SLOT) {
       warn.style.display = 'block';
       document.getElementById('orderSubmit').disabled = true;
-    } else {
-      warn.style.display = 'none';
-      document.getElementById('orderSubmit').disabled = false;
     }
   } catch (err) {
-    console.error('Slot check error:', err);
+    if (err.name !== 'AbortError') console.error('Slot check error:', err);
   }
 }
 
