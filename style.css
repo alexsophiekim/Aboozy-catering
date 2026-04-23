@@ -30,7 +30,7 @@ header {
 }
 header img {
   filter: invert(1);
-  height: 32px;
+  height: 50px;
   width: auto;
 }
 
